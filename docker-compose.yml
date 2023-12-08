@@ -1,0 +1,38 @@
+version: "3.8"
+services:
+    database:
+        container_name: database
+        image: postgres:15.5-alpine
+        env_file:
+            - .env
+        volumes:
+            - itss-db:/data/postgres
+            - itss-db:/var/lib/postgresql/data
+            - ./database:/docker-entrypoint-initdb.d
+        ports:
+            - "5432:5432"
+        networks:
+            - itss-net
+
+    backend:
+        container_name: backend
+        build: .
+        volumes:
+            -   ./:/app
+        env_file:
+            - .env
+        command: npm start
+        ports:
+            - "80:80"
+        image: backend
+        networks:
+            - itss-net
+        depends_on:
+            - database
+networks:
+    itss-net:
+        driver: bridge
+
+volumes:
+    itss-db:
+        driver: local

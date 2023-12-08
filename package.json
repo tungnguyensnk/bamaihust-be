@@ -1,0 +1,17 @@
+{
+  "name": "bamaihust-be",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^8.3.1",
+    "cookie-parser": "^1.4.6",
+    "date-and-time": "^3.0.3",
+    "debug": "^4.3.4",
+    "express": "^4.18.2",
+    "morgan": "^1.10.0",
+    "pg": "^8.11.3"
+  }
+}
