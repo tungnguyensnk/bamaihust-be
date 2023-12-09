@@ -8,4 +8,6 @@ router.get('/all', controllers.questions.getAllQuestions);
 router.get('/:id', controllers.questions.getQuestionById);
 router.post('/create', middlewares.validator(utils.validator.question), controllers.questions.createQuestion);
 
+router.put('/:id/like', controllers.questions.createQuestionLikes);
+
 module.exports = router;

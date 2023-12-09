@@ -5,7 +5,7 @@ const getAllQuestions = async () => {
     return (await query(text)).rows;
 }
 
-const getQuestionById = async (id) => {
+const findById = async (id) => {
     const text = `SELECT *
                   FROM questions
                   WHERE id = ${id}`;
@@ -27,7 +27,7 @@ const increaseViewCount = async (question_id) => {
 }
 module.exports = {
     getAllQuestions,
-    getQuestionById,
+    findById,
     createQuestion,
     increaseViewCount
 }

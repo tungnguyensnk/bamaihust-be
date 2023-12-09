@@ -229,7 +229,7 @@ ALTER FUNCTION public.trigger_set_timestamp() OWNER TO postgres;
 -- Name: update_answer_like_count(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.update_answer_like_count() RETURNS trigger
+CREATE OR REPLACE FUNCTION public.update_answer_like_count() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 
@@ -239,23 +239,17 @@ BEGIN
 
 
 
-    UPDATE answers
-
-
-
-    SET likeCount = (
-
-
-
-        SELECT COUNT(*) FROM answer_likes WHERE answer_likes.answerId = NEW.answerId
-
-
-
-    )
-
-
-
-    WHERE answers.id = NEW.answerId;
+    IF TG_OP = 'INSERT' THEN
+        -- Update likecount when a new row is inserted
+        UPDATE answers
+        SET likecount = (SELECT COALESCE(COUNT(*), 0) FROM answer_likes WHERE answer_likes.answerId = NEW.answerId)
+        WHERE answers.id = NEW.answerId;
+    ELSIF TG_OP = 'DELETE' THEN
+        -- Update likecount when a row is deleted
+        UPDATE answers
+        SET likecount = (SELECT COALESCE(COUNT(*), 0) FROM answer_likes WHERE answer_likes.answerId = OLD.answerId)
+        WHERE answers.id = OLD.answerId;
+    END IF;
 
 
 
@@ -276,7 +270,7 @@ ALTER FUNCTION public.update_answer_like_count() OWNER TO postgres;
 -- Name: update_question_like_count(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.update_question_like_count() RETURNS trigger
+CREATE OR REPLACE FUNCTION public.update_question_like_count() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 
@@ -286,24 +280,17 @@ BEGIN
 
 
 
-    UPDATE questions
-
-
-
-    SET likeCount = (
-
-
-
-        SELECT COUNT(*) FROM question_likes WHERE question_likes.questionId = NEW.questionId
-
-
-
-    )
-
-
-
-    WHERE questions.id = NEW.questionId;
-
+    IF TG_OP = 'INSERT' THEN
+        -- Update likecount when a new row is inserted
+        UPDATE questions
+        SET likecount = (SELECT COALESCE(COUNT(*), 0) FROM question_likes WHERE question_likes.questionId = NEW.questionId)
+        WHERE questions.id = NEW.questionId;
+    ELSIF TG_OP = 'DELETE' THEN
+        -- Update likecount when a row is deleted
+        UPDATE questions
+        SET likecount = (SELECT COALESCE(COUNT(*), 0) FROM question_likes WHERE question_likes.questionId = OLD.questionId)
+        WHERE questions.id = OLD.questionId;
+    END IF;
 
 
     RETURN NEW;
