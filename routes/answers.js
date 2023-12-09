@@ -5,5 +5,6 @@ let middlewares = require('../middlewares');
 let utils = require('../utils');
 
 router.put('/:id/like', controllers.answers.createAnswerLikes);
+router.post('/', middlewares.validator(utils.validator.answer), controllers.answers.createAnswer);
 
 module.exports = router;

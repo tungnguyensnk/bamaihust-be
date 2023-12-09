@@ -15,7 +15,7 @@ const createAnswerLikes = async (req, res) => {
     } else {
       // Nếu chưa like, tạo record trong bảng answer_likes
       await DB.answerLikes.createLike(answerId, userId);
-      
+
       // Lấy thông tin user
       const user = await DB.users.findById(userId);
 
@@ -24,7 +24,7 @@ const createAnswerLikes = async (req, res) => {
       const content = `${user.fullname} đã thích câu trả lời của bạn: ${answer.content}`;
       await DB.answerNotifications.createAnswerNotification(
         userId,
-        answer.userId,
+        answer.userid,
         answerId,
         content
       );
@@ -46,6 +46,36 @@ const createAnswerLikes = async (req, res) => {
   }
 };
 
+const createAnswer = async (req, res) => {
+  const {question_id, content, is_anonymous, user_id} = req.body;
+
+  // Lấy thông tin question
+  const question = await DB.questions.findById(question_id);
+
+  const result = await DB.answers.createAnswer(question_id, content, is_anonymous, user_id);
+
+  if (result) {
+    // Lấy thông tin user
+    const user = await DB.users.findById(question.userid);
+
+    // Tạo thông báo cho người viết câu hỏi
+    const content = `${is_anonymous ? 'Ai đó' : user.fullname} đã trả lời về câu hỏi của bạn: ${question.title}`;
+    await DB.questionNotifications.createQuestionNotification(user_id, question.userid, question_id, content);
+
+    res.status(201).json({
+      status: 'success',
+      data: result,
+      message: 'Answer created successfully',
+    });
+  } else {
+    res.status(500).json({
+      status: 'fail',
+      message: 'Something went wrong',
+    });
+  }
+};
+
 module.exports = {
   createAnswerLikes,
+  createAnswer,
 };
