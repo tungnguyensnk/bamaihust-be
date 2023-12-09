@@ -1,6 +1,5 @@
 module.exports = {
-    users: require('./users'),
     questions: require('./questions'),
+    users: require('./users'),
     answers: require('./answers'),
-    tags: require('./tags'),
-};
+}

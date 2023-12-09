@@ -1,7 +1,7 @@
 const {vi, en, Faker} = require('@faker-js/faker');
 const faker = new Faker({locale: [vi, en]});
 const date = require('date-and-time')
-const {client, query} = require('./index');
+const {client, query} = require('./client');
 
 const TOTAL = 100;
 const randomUser = async () => {
@@ -100,10 +100,10 @@ const seed = async () => {
     console.log('Seeding data...');
     await client.connect();
     // remove all data
-    await query(`DELETE FROM answers`);
-    await query(`DELETE FROM questions`);
-    await query(`DELETE FROM users`);
-    await query(`DELETE FROM tags`);
+    await query(`DELETE FROM answers CASCADE`);
+    await query(`DELETE FROM questions CASCADE`);
+    await query(`DELETE FROM users CASCADE`);
+    await query(`DELETE FROM tags CASCADE`);
 
     // reset auto increment
     await query(`TRUNCATE users RESTART IDENTITY CASCADE;`);

@@ -9,6 +9,7 @@ services:
             - itss-db:/data/postgres
             - itss-db:/var/lib/postgresql/data
             - ./database:/docker-entrypoint-initdb.d
+        restart: unless-stopped
         ports:
             - "5432:5432"
         networks:
