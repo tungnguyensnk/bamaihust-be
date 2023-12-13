@@ -52,6 +52,13 @@ const createAnswer = async (req, res) => {
   // Lấy thông tin question
   const question = await DB.questions.findById(question_id);
 
+  if (!question) {
+    res.status(400).json({
+      status: 'fail',
+      message: 'Not found question',
+    });
+  }
+
   const result = await DB.answers.createAnswer(question_id, content, is_anonymous, user_id);
 
   if (result) {
