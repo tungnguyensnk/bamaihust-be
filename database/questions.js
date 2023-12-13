@@ -2,14 +2,14 @@ const {query} = require('./client');
 
 const getAllQuestions = async () => {
     const text = 'SELECT * FROM questions';
-    return (await query(text)).rows;
+    return (await query(text))?.rows;
 }
 
 const findById = async (id) => {
     const text = `SELECT *
                   FROM questions
                   WHERE id = ${id}`;
-    return (await query(text)).rows[0];
+    return (await query(text))?.rows[0];
 }
 
 const createQuestion = async (title, content, is_anonymous, user_id) => {
