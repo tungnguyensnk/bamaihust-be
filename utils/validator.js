@@ -31,7 +31,19 @@ const answer = [
         .isIn([0, 1]).withMessage('is_anonymous must be 0 or 1'),
 ];
 
+const mainPage = [
+    check('numberOfPage')
+        .optional()
+        .isInt({min: 1}).withMessage('numberOfPage must be an integer greater than 0'),
+    check('pageSize')
+        .optional()
+        .isInt({min: 1}).withMessage('pageSize must be an integer greater than 0'),
+    check('sort')
+        .optional()
+        .isIn(['newest', 'trending']).withMessage('sort must be \'newest\' or \'trending\''),
+];
 module.exports = {
     question,
     answer,
+    mainPage,
 }

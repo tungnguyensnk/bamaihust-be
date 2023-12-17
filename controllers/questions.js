@@ -1,8 +1,39 @@
 const DB = require('../database');
 const utils = require('../utils');
 const getAllQuestions = async (req, res) => {
-  const result = await DB.questions.getAllQuestions();
-  res.json(result);
+    let {numberOfPage, pageSize, sort} = req.query;
+    numberOfPage??=1;
+    pageSize ??= 10;
+    sort ??= 'trending';
+    let result;
+    switch (sort) {
+        case 'newest':
+            result = await DB.questions.getAllByNewest(numberOfPage, pageSize);
+            break;
+        case 'trending':
+        default:
+            result = await DB.questions.getAllByTrending(numberOfPage, pageSize);
+            break;
+    }
+    if (result) {
+        for (let question of result) {
+            question.author = utils.minInfo.user(await DB.users.findById(question.userid));
+            question.tags = await DB.tags.getTagsByQuestionId(question.id);
+            delete question.userid;
+        }
+        res.json({
+            status: 'success',
+            numberOfPage: numberOfPage,
+            pageSize: pageSize,
+            sort: sort,
+            questions: result,
+        });
+    } else {
+        res.status(500).json({
+            status: 'fail',
+            message: 'Something went wrong',
+        });
+    }
 };
 
 const getQuestionById = async (req, res) => {
@@ -96,8 +127,8 @@ const createQuestionLikes = async (req, res) => {
 };
 
 module.exports = {
-  getAllQuestions,
-  getQuestionById,
-  createQuestion,
-  createQuestionLikes,
+    getAllQuestions,
+    getQuestionById,
+    createQuestion,
+    createQuestionLikes
 };

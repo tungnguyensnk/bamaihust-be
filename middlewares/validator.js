@@ -6,7 +6,10 @@ const validator = (schema) => {
         if (errors.isEmpty()) {
             return next();
         }
-        res.status(400).json({errors: errors.array()});
+        res.status(400).json({
+            status: 'fail',
+            errors: errors.array().map((e) => e.msg),
+        });
     }
 }
 
