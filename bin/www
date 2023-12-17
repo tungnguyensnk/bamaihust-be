@@ -6,20 +6,24 @@
 
 var app = require('../app');
 var debug = require('debug')('bamaihust-be:server');
-var http = require('http');
+var https = require('https');
+const {readFileSync} = require("fs");
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '80');
+var port = normalizePort(process.env.PORT || '443');
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+var server = https.createServer({
+  key: readFileSync('/app/sslcert/privkey.pem'),
+  cert: readFileSync('/app/sslcert/fullchain.pem'),
+}, app);
 
 /**
  * Listen on provided port, on all network interfaces.
