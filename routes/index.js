@@ -6,7 +6,7 @@ let questionsRouter = require('./questions');
 let usersRouter = require('./users');
 let answersRouter = require('./answers');
 let searchRouter = require('./search');
-
+let tagsRouter = require('./tags');
 /* GET home page. */
 router.get('/health', (req, res) => {
     res.json({status: 'UP'});
@@ -16,5 +16,6 @@ router.use('/question', questionsRouter);
 router.use('/user', usersRouter);
 router.use('/answer', answersRouter);
 router.use('/search', searchRouter);
+router.use('/tag', tagsRouter);
 
 module.exports = router;
