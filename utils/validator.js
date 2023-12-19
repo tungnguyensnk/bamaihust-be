@@ -31,6 +31,28 @@ const answer = [
         .isIn([0, 1]).withMessage('is_anonymous must be 0 or 1'),
 ];
 
+const search = [
+    check('objectType')
+        .exists().isIn(['user', 'question']).withMessage('Object type must be user or question'),
+
+    check('tags')
+        .isArray().withMessage('Tags must be an array')
+        .optional()
+        .isArray({ max: 5 }).withMessage('Tags array should have at most 5 elements'),
+
+    check('status')
+        .optional()
+        .isIn(['all', 'solved', 'not resolved']).withMessage('Status should be one of: all, solved, not resolved'),
+
+    check('sortBy')
+        .optional()
+        .isIn(['popular', 'latest']).withMessage('SortBy should be one of: popular, latest'),
+
+    check('page')
+        .optional()
+        .isNumeric().withMessage('Page should be a number'),
+]
+
 const mainPage = [
     check('numberOfPage')
         .optional()
@@ -42,8 +64,10 @@ const mainPage = [
         .optional()
         .isIn(['newest', 'trending']).withMessage('sort must be \'newest\' or \'trending\''),
 ];
+
 module.exports = {
     question,
     answer,
+    search,
     mainPage,
 }
