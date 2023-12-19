@@ -3,4 +3,5 @@ module.exports = {
     users: require('./users'),
     answers: require('./answers'),
     search: require('./search'),
+    tags: require('./tags'),
 }

@@ -22,8 +22,14 @@ const mapTagToQuestion = async (tag_id, question_id) => {
                   VALUES (${question_id}, ${tag_id})`;
     return await query(text);
 }
+
+const getAllTags = async () => {
+    const text = `SELECT * FROM tags`;
+    return (await query(text)).rows;
+}
 module.exports = {
     getTagsByQuestionId,
     createTag,
-    mapTagToQuestion
+    mapTagToQuestion,
+    getAllTags,
 }
