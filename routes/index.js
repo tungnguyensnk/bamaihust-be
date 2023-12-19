@@ -8,8 +8,8 @@ let answersRouter = require('./answers');
 let searchRouter = require('./search');
 let tagsRouter = require('./tags');
 /* GET home page. */
-router.get('/health', (req, res) => {
-    res.json({status: 'UP'});
+router.get('/', (req, res) => {
+    res.json({status: 'healthy'});
 });
 
 router.use('/question', questionsRouter);

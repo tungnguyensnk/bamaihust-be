@@ -28,24 +28,31 @@ const increaseViewCount = async (question_id) => {
 
 const getAllByTrending = async (numberOfPage, pageSize) => {
   const text = `SELECT q.*,
-                         (SELECT COUNT(*)
-                          FROM question_notifications qn
-                          WHERE qn.questionId = q.id)
-                             +
-                         (SELECT COUNT(*)
-                          FROM answer_notifications an
-                                   JOIN answers a on a.id = an.answerId
-                          WHERE a.questionId = q.id) AS score
-                  FROM questions q
-                  ORDER BY score DESC, q.id DESC
-                  LIMIT ${pageSize} OFFSET ${(numberOfPage - 1) * pageSize}`;
+                       (SELECT COUNT(*)
+                        FROM question_notifications qn
+                        WHERE qn.questionId = q.id)
+                           +
+                       (SELECT COUNT(*)
+                        FROM answer_notifications an
+                                 JOIN answers a on a.id = an.answerId
+                        WHERE a.questionId = q.id) AS score,
+                       (SELECT COUNT(*)
+                        FROM answers a
+                        WHERE a.questionId = q.id) AS answercount
+                FROM questions q
+                ORDER BY score DESC, q.id DESC
+                LIMIT ${pageSize} OFFSET ${(numberOfPage - 1) * pageSize}`;
   return (await query(text))?.rows;
 };
 
 const getAllByNewest = async (numberOfPage, pageSize) => {
-  const text = `SELECT * FROM questions
-                  ORDER BY id DESC
-                  LIMIT ${pageSize} OFFSET ${(numberOfPage - 1) * pageSize}`;
+  const text = `SELECT questions.*,
+                            (SELECT COUNT(*)
+                            FROM answers
+                            WHERE answers.questionid = questions.id) AS answercount
+                FROM questions
+                ORDER BY id DESC
+                LIMIT ${pageSize} OFFSET ${(numberOfPage - 1) * pageSize}`;
   return (await query(text))?.rows;
 };
 
