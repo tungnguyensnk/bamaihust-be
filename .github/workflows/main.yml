@@ -1,16 +1,15 @@
 name: Push Docker image and deploy to VPS
 
 on:
-  pull_request:
-    branches: [ "release" ]
-    types:
-      - closed
+#  pull_request:
+#    branches: [ "release" ]
+#    types:
+#      - closed
   push:
     branches: [ "release" ]
 
 jobs:
   build:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -25,7 +24,6 @@ jobs:
           docker push tungnguyensnk/itss:dev
 
   deploy:
-    if: github.event.pull_request.merged == true
     needs: build
     runs-on: ubuntu-latest
     steps:
