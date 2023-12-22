@@ -36,8 +36,8 @@ jobs:
           script: |
             if [ ! -d "bamaihust-be" ]; then
               git clone https://github.com/tungnguyensnk/bamaihust-be
+              cp bamaihust-be/.env.example bamaihust-be/.env
             fi
             cd bamaihust-be
             git pull
-            docker rm -f backend
-            docker-compose up -d --build
+            docker rm -f backend && docker-compose up -d --build
