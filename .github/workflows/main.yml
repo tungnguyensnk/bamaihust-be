@@ -5,9 +5,12 @@ on:
     branches: [ "release" ]
     types:
       - closed
+  push:
+    branches: [ "release" ]
 
 jobs:
   build:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
