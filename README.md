@@ -1,6 +1,6 @@
 # Project ITSS BackEnd
 
-[![Push Docker image and deploy to VPS](https://github.com/tungnguyensnk/bamaihust-be/actions/workflows/main.yml/badge.svg)](https://github.com/tungnguyensnk/bamaihust-be/actions/workflows/main.yml)
+[![Push Docker image and deploy to VPS](https://github.com/tungnguyensnk/bamaihust-be/actions/workflows/main.yml/badge.svg?branch=release)](https://github.com/tungnguyensnk/bamaihust-be/actions/workflows/main.yml)
 
 > Link deploy: https://unixp.h4ck.me/
 
