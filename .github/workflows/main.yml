@@ -1,0 +1,45 @@
+name: Push Docker image and deploy to VPS
+
+on:
+#  pull_request:
+#    branches: [ "release" ]
+#    types:
+#      - closed
+  push:
+    branches: [ "release" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Build and push Docker image
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+          docker build -t tungnguyensnk/itss:dev .
+          docker push tungnguyensnk/itss:dev
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          script: |
+            if [ ! -d "bamaihust-be" ]; then
+              git clone https://github.com/tungnguyensnk/bamaihust-be
+              cp bamaihust-be/.env.example bamaihust-be/.env
+            fi
+            cd bamaihust-be
+            git pull
+            docker rm -f backend && docker-compose up -d --build
