@@ -165,6 +165,13 @@ const searchAndFilter = async (filter) => {
   }
 };
 
+const acceptAnswer = async (answerId, questionId) => {
+  const text = `UPDATE questions
+  SET acceptedanswerid = ${answerId}
+  WHERE id = ${questionId}`;
+  return (await query(text))?.rows;
+};
+
 module.exports = {
   getAllQuestions,
   findById,
@@ -173,4 +180,5 @@ module.exports = {
   searchAndFilter,
   getAllByTrending,
   getAllByNewest,
+  acceptAnswer,
 };

@@ -82,7 +82,54 @@ const createAnswer = async (req, res) => {
   }
 };
 
+
+const acceptAnswer = async (req, res) => {
+  try {
+    const answerid = req.params.id;
+    const userId = req.body.userId;
+
+    const answer = await DB.answers.findById(answerid);
+    if (!answer?.questionid) {
+      res.status(404).json({
+        status: 'fail',
+        message: 'Not found answer',
+      });
+    }
+
+    const user = await DB.users.findById(userId);
+    if (!user) {
+      res.status(404).json({
+        status: 'fail',
+        message: 'Not found user',
+      });
+    }
+
+    await DB.questions.acceptAnswer(answerid, answer.questionid)
+
+    // Tạo thông báo cho người viết câu trả lời
+    const content = `${user.fullname} đã chấp nhận câu trả lời của bạn: ${answer.content}`;
+    await DB.answerNotifications.createAnswerNotification(
+      userId,
+      answer.userid,
+      answerid,
+      content
+    );
+
+    res.json({
+      status: 'success',
+      message: 'Câu trả lời đã được chấp nhận.',
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      status: 'fail',
+      message: 'Something went wrong',
+    });
+  }
+};
+
 module.exports = {
   createAnswerLikes,
   createAnswer,
+  acceptAnswer,
 };
