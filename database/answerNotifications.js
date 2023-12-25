@@ -7,6 +7,16 @@ const createAnswerNotification = async (senderid, recipientid, answerid, content
   return await query(text);
 };
 
+const deleteNotification = async (senderid, recipientid, answerid, content) => {
+  const text = `
+    DELETE FROM answer_notifications
+    WHERE answerid = ${answerid} AND senderid = ${senderid} AND recipientid = ${recipientid} AND content = '${content}'
+  `;
+
+  return await query(text);
+};
+
 module.exports = {
-    createAnswerNotification,
+  createAnswerNotification,
+  deleteNotification,
 };

@@ -4,4 +4,5 @@ module.exports = {
     answers: require('./answers'),
     search: require('./search'),
     tags: require('./tags'),
+    notifications: require('./notifications'),
 }

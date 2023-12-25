@@ -91,6 +91,19 @@ const createQuestionLikes = async (req, res) => {
     if (existingLike) {
       // Nếu đã like, thực hiện unlike
       await DB.questionLikes.unlike(questionId, userId);
+      
+      // Lấy thông tin user
+      const user = await DB.users.findById(userId);
+
+      // Xóa thông báo cho người viết câu hỏi
+      const question = await DB.questions.findById(questionId);
+      const content = `${user.fullname} đã thích câu hỏi của bạn: ${question.content}`;
+      await DB.questionNotifications.deleteNotification(
+        userId,
+        question.userid,
+        questionId,
+        content
+      );
     } else {
       // Nếu chưa like, tạo record trong bảng question_likes
       await DB.questionLikes.createLike(questionId, userId);
