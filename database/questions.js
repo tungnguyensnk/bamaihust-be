@@ -178,6 +178,13 @@ const acceptAnswer = async (answerId, questionId) => {
   return (await query(text))?.rows;
 };
 
+const isLiked = async (questionId, userId) => {
+    const text = `SELECT *
+    FROM question_likes
+    WHERE questionid = ${questionId} AND userid = ${userId}`;
+    return (await query(text))?.rows[0];
+}
+
 module.exports = {
   getAllQuestions,
   findById,
@@ -188,4 +195,5 @@ module.exports = {
   getAllByNewest,
   acceptAnswer,
   getTotalPages,
+  isLiked,
 };
