@@ -16,15 +16,26 @@ const getAllQuestions = async (req, res) => {
             break;
     }
     if (result) {
+        if(result.length === 0) {
+            return res.status(404).json({
+                status: 'fail',
+                errors: [
+                    `numberOfPage: ${numberOfPage} is not valid`
+                ]
+            });
+        }
+        let totalPage = Math.ceil(result[0]?.totalcount / pageSize);
         for (let question of result) {
             question.author = utils.minInfo.user(await DB.users.findById(question.userid));
             question.tags = await DB.tags.getTagsByQuestionId(question.id);
             delete question.userid;
+            delete question.totalcount;
         }
         res.json({
             status: 'success',
-            numberOfPage: numberOfPage,
-            pageSize: pageSize,
+            numberOfPage: parseInt(numberOfPage),
+            totalPage: totalPage,
+            pageSize: parseInt(pageSize),
             sort: sort,
             questions: result,
         });

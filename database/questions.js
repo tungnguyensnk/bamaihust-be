@@ -28,6 +28,7 @@ const increaseViewCount = async (question_id) => {
 
 const getAllByTrending = async (numberOfPage, pageSize) => {
   const text = `SELECT q.*,
+                       count(*) OVER () AS totalcount,
                        (SELECT COUNT(*)
                         FROM question_notifications qn
                         WHERE qn.questionId = q.id)
@@ -47,6 +48,7 @@ const getAllByTrending = async (numberOfPage, pageSize) => {
 
 const getAllByNewest = async (numberOfPage, pageSize) => {
   const text = `SELECT questions.*,
+                            count(*) OVER () AS totalcount,
                             (SELECT COUNT(*)
                             FROM answers
                             WHERE answers.questionid = questions.id) AS answercount
