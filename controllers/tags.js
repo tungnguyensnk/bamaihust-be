@@ -5,6 +5,12 @@ const getAllTags = async (req, res) => {
     res.json(tags);
 }
 
+const getTopTags = async (req, res) => {
+    const tags = await DB.tags.getTopTags();
+    res.json(tags);
+}
+
 module.exports = {
     getAllTags,
+    getTopTags,
 }

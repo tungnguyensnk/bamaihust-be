@@ -1,39 +1,43 @@
 const DB = require('../database');
 const utils = require('../utils');
 const getAllQuestions = async (req, res) => {
-    let {numberOfPage, pageSize, sort} = req.query;
-    numberOfPage??=1;
-    pageSize ??= 10;
-    sort ??= 'trending';
-    let result;
-    switch (sort) {
-        case 'newest':
-            result = await DB.questions.getAllByNewest(numberOfPage, pageSize);
-            break;
-        case 'trending':
-        default:
-            result = await DB.questions.getAllByTrending(numberOfPage, pageSize);
-            break;
+  let {numberOfPage, pageSize, sort} = req.query;
+  numberOfPage ??= 1;
+  pageSize ??= 10;
+  sort ??= 'trending';
+  let result;
+  switch (sort) {
+    case 'newest':
+      result = await DB.questions.getAllByNewest(numberOfPage, pageSize);
+      break;
+    case 'trending':
+    default:
+      result = await DB.questions.getAllByTrending(numberOfPage, pageSize);
+      break;
+  }
+  if (result) {
+    for (let question of result) {
+      question.author = utils.minInfo.user(await DB.users.findById(question.userid));
+      question.tags = await DB.tags.getTagsByQuestionId(question.id);
+      delete question.userid;
     }
-    if (result) {
-        for (let question of result) {
-            question.author = utils.minInfo.user(await DB.users.findById(question.userid));
-            question.tags = await DB.tags.getTagsByQuestionId(question.id);
-            delete question.userid;
-        }
-        res.json({
-            status: 'success',
-            numberOfPage: numberOfPage,
-            pageSize: pageSize,
-            sort: sort,
-            questions: result,
-        });
-    } else {
-        res.status(500).json({
-            status: 'fail',
-            message: 'Something went wrong',
-        });
-    }
+
+    const totalPages = await DB.questions.getTotalPages(pageSize);
+
+    res.json({
+      status: 'success',
+      numberOfPage: numberOfPage,
+      pageSize: pageSize,
+      totalPages: totalPages,
+      sort: sort,
+      questions: result,
+    });
+  } else {
+    res.status(500).json({
+      status: 'fail',
+      message: 'Something went wrong',
+    });
+  }
 };
 
 const getQuestionById = async (req, res) => {
@@ -91,7 +95,7 @@ const createQuestionLikes = async (req, res) => {
     if (existingLike) {
       // Nếu đã like, thực hiện unlike
       await DB.questionLikes.unlike(questionId, userId);
-      
+
       // Lấy thông tin user
       const user = await DB.users.findById(userId);
 
@@ -140,8 +144,8 @@ const createQuestionLikes = async (req, res) => {
 };
 
 module.exports = {
-    getAllQuestions,
-    getQuestionById,
-    createQuestion,
-    createQuestionLikes
+  getAllQuestions,
+  getQuestionById,
+  createQuestion,
+  createQuestionLikes,
 };

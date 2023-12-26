@@ -27,9 +27,20 @@ const getAllTags = async () => {
     const text = `SELECT * FROM tags`;
     return (await query(text)).rows;
 }
+
+const getTopTags = async () => {
+    const text = `
+        SELECT * FROM tags
+        ORDER BY count DESC
+        LIMIT 20
+    `;
+    return (await query(text)).rows;
+}
+
 module.exports = {
     getTagsByQuestionId,
     createTag,
     mapTagToQuestion,
     getAllTags,
+    getTopTags,
 }
