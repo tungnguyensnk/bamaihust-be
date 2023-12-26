@@ -57,13 +57,9 @@ const getAllByNewest = async (numberOfPage, pageSize) => {
 };
 
 const getTotalPages = async (pageSize) => {
-  const countText = `
-    SELECT COUNT(*) AS totalQuestions
-    FROM questions q
-  `;
-  const totalCount = (await query(countText)).rows[0].totalQuestions;
-  const totalPages = Math.ceil(totalCount / pageSize);
-  return totalPages;
+    const text = `SELECT CEIL(COUNT(*)::NUMERIC / ${pageSize}) AS totalpages
+                    FROM questions`;
+    return (await query(text))?.rows[0]?.totalpages;
 };
 
 const searchAndFilter = async (filter) => {
