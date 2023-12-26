@@ -19,6 +19,7 @@ const getAllQuestions = async (req, res) => {
     for (let question of result) {
       question.author = utils.minInfo.user(await DB.users.findById(question.userid));
       question.tags = await DB.tags.getTagsByQuestionId(question.id);
+      req.query?.userId && (question.is_liked = !!(await DB.questions.isLiked(question.id, req.query.userId)));
       delete question.userid;
     }
 
@@ -53,10 +54,12 @@ const getQuestionById = async (req, res) => {
   question.author = utils.minInfo.user(await DB.users.findById(question.userid));
   question.tags = await DB.tags.getTagsByQuestionId(id);
   question.answers = await DB.answers.getAnswersByQuestionId(id);
+  req.query?.userId && (question.is_liked = !!(await DB.questions.isLiked(question.id, req.query.userId)));
   for (let answer of question.answers) {
     answer.user = utils.minInfo.user(await DB.users.findById(answer.userid));
     answer.is_accepted = question.acceptedanswerid === answer.id;
     answer.diem_danh_gia = answer.likecount;
+    req.query?.userId && (answer.is_liked = !!(await DB.answers.isLiked(answer.id, req.query.userId)));
   }
   delete question.userid;
   res.json(question);

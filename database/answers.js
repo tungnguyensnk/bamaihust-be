@@ -21,8 +21,16 @@ const createAnswer = async (question_id, content, is_anonymous, user_id) => {
     return (await query(text))?.rows[0];
 }
 
+const isLiked = async (answer_id, user_id) => {
+    const text = `SELECT *
+                  FROM answer_likes
+                  WHERE answerid = ${answer_id} AND userid = ${user_id}`;
+    return (await query(text))?.rows[0];
+}
+
 module.exports = {
     getAnswersByQuestionId,
     findById,
     createAnswer,
+    isLiked,
 }
