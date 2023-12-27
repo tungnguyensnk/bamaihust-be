@@ -57,9 +57,9 @@ const getAllByNewest = async (numberOfPage, pageSize) => {
 };
 
 const getTotalPages = async (pageSize) => {
-    const text = `SELECT CEIL(COUNT(*)::NUMERIC / ${pageSize}) AS totalpages
+  const text = `SELECT CEIL(COUNT(*)::NUMERIC / ${pageSize}) AS totalpages
                     FROM questions`;
-    return (await query(text))?.rows[0]?.totalpages;
+  return (await query(text))?.rows[0]?.totalpages;
 };
 
 const searchAndFilter = async (filter) => {
@@ -122,12 +122,22 @@ const searchAndFilter = async (filter) => {
     // Lấy dữ liệu trang hiện tại và thêm thông tin về số câu trả lời và danh sách tags
     const dataQuery = `
     SELECT questions.*, 
-      users.fullname as author_fullname,
-      users.avatarurl as author_avatar,
+      (
+        SELECT JSONB_AGG(
+            JSONB_BUILD_OBJECT(
+                'id', users.id,
+                'fullname', users.fullname,
+                'avatarurl', users.avatarurl
+            )
+        )
+        FROM users
+        WHERE questions.userid = users.id
+      ) as author,
       (SELECT COUNT(*) FROM answers WHERE answers.questionid = questions.id) as answercount,
       (
         SELECT JSONB_AGG(
             JSONB_BUILD_OBJECT(
+                'id', tags.id,
                 'tagname', tags.tagname,
                 'color', tags.color
             )
