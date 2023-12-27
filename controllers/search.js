@@ -3,13 +3,13 @@ const DB = require('../database');
 const searchAndFilter = async (req, res) => {
   try {
     let data;
-    const {keyword, objectType, tags, status, sortBy, page} = req.query;
+    const {keyword, objectType, tags, status, sort, page} = req.query;
     const limit = 5;
 
     // Thiết lập giá trị mặc định
     const defaultStatus = 'all';
     const defaultPage = 1;
-    const defaultSortBy = 'latest';
+    const defaultSort = 'newest';
 
     // Áp dụng giá trị mặc định nếu không được cung cấp
     const filter = {
@@ -17,7 +17,7 @@ const searchAndFilter = async (req, res) => {
       objectType,
       tags,
       status: status || defaultStatus,
-      sortBy: sortBy || defaultSortBy,
+      sort: sort || defaultSort,
       page: page ? parseInt(page) : defaultPage,
       limit,
     };

@@ -19,12 +19,7 @@ const createAnswerLikes = async (req, res) => {
       // Xóa thông báo cho người viết câu trả lời
       const answer = await DB.answers.findById(answerId);
       const content = `${user.fullname} đã thích câu trả lời của bạn: ${answer.content}`;
-      await DB.answerNotifications.deleteNotification(
-        userId,
-        answer.userid,
-        answerId,
-        content
-      );
+      await DB.answerNotifications.deleteNotification(userId, answer.userid, answerId, content);
     } else {
       // Nếu chưa like, tạo record trong bảng answer_likes
       await DB.answerLikes.createLike(answerId, userId);
@@ -79,8 +74,15 @@ const createAnswer = async (req, res) => {
     const user = await DB.users.findById(question.userid);
 
     // Tạo thông báo cho người viết câu hỏi
-    const content = `${is_anonymous ? 'Ai đó' : user.fullname} đã trả lời về câu hỏi của bạn: ${question.title}`;
-    await DB.questionNotifications.createQuestionNotification(user_id, question.userid, question_id, content);
+    const content = `${is_anonymous ? 'Ai đó' : user.fullname} đã trả lời về câu hỏi của bạn: ${
+      question.title
+    }`;
+    await DB.questionNotifications.createQuestionNotification(
+      user_id,
+      question.userid,
+      question_id,
+      content
+    );
 
     res.status(201).json({
       status: 'success',
@@ -94,7 +96,6 @@ const createAnswer = async (req, res) => {
     });
   }
 };
-
 
 const acceptAnswer = async (req, res) => {
   try {

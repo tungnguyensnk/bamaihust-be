@@ -44,9 +44,9 @@ const search = [
         .optional()
         .isIn(['all', 'solved', 'not resolved']).withMessage('Status should be one of: all, solved, not resolved'),
 
-    check('sortBy')
+    check('sort')
         .optional()
-        .isIn(['popular', 'latest']).withMessage('SortBy should be one of: popular, latest'),
+        .isIn(['trending', 'newest']).withMessage('Sort should be one of: trending, newest'),
 
     check('page')
         .optional()

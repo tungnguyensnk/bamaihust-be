@@ -14,12 +14,12 @@ const findById = async (id) => {
 
 const findByKeyword = async (filter) => {
   try {
-    const {keyword, page, sortBy, limit} = filter;
+    const {keyword, page, sort, limit} = filter;
     const offset = (page - 1) * limit;
 
     // Sắp xếp
     let orderByField;
-    if (sortBy === 'popular') {
+    if (sort === 'trending') {
       // TODO: reputation
       orderByField =
           '(SELECT COUNT(*) FROM question_notifications WHERE recipientid = users.id) + (SELECT COUNT(*) FROM answer_notifications WHERE recipientid = users.id)';

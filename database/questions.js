@@ -64,12 +64,12 @@ const getTotalPages = async (pageSize) => {
 
 const searchAndFilter = async (filter) => {
   try {
-    const {keyword, tags, status, sortBy, page, limit} = filter;
+    const {keyword, tags, status, sort, page, limit} = filter;
     const offset = (page - 1) * limit;
 
     // Sắp xếp
     let orderByField = '';
-    if (sortBy === 'popular') {
+    if (sort === 'trending') {
       orderByField = `
     (SELECT COUNT(*) FROM question_notifications WHERE questionid = questions.id) +
     (SELECT COUNT(*) FROM answer_notifications 
