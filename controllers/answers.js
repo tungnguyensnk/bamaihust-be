@@ -99,42 +99,55 @@ const createAnswer = async (req, res) => {
 
 const acceptAnswer = async (req, res) => {
   try {
-    const answerid = req.params.id;
-    const userId = req.body.userId;
+    const answerId = req.params.id;
+    const userId = req.body.userId; // ID of the user who wrote the question
 
-    const answer = await DB.answers.findById(answerid);
-    if (!answer?.questionid) {
+    const answer = await DB.answers.findById(answerId);
+    if (!answer?.questionId) {
       res.status(404).json({
         status: 'fail',
-        message: 'Not found answer',
+        message: 'Answer not found',
       });
     }
 
-    const question = await DB.questions.findById(answer?.questionid);
+    const question = await DB.questions.findById(answer?.questionId);
 
-    if (!question?.acceptedanswerid) {
+    if (!question?.acceptedAnswerId) {
+      // Check if the answer is associated with the question
+      if (question.id !== answer.questionId) {
+        res.status(404).json({
+          status: 'fail',
+          message: 'Answer does not exist',
+        });
+      }
+
       const user = await DB.users.findById(userId);
       if (!user) {
         res.status(404).json({
           status: 'fail',
-          message: 'Not found user',
+          message: 'User not found',
         });
       }
 
-      await DB.questions.acceptAnswer(answerid, answer.questionid);
+      await DB.questions.acceptAnswer(answerId, answer.questionId);
 
-      // Tạo thông báo cho người viết câu trả lời
+      // Create a notification for the user who wrote the answer
       const content = `${user.fullname} đã chấp nhận câu trả lời của bạn: ${answer.content}`;
       await DB.answerNotifications.createAnswerNotification(
         userId,
-        answer.userid,
-        answerid,
+        answer.userId,
+        answerId,
         content
       );
 
       res.json({
         status: 'success',
-        message: 'Câu trả lời đã được chấp nhận.',
+        message: 'Answer has been accepted',
+      });
+    } else {
+      res.status(400).json({
+        status: 'fail',
+        message: 'Question already has an accepted answer',
       });
     }
   } catch (error) {

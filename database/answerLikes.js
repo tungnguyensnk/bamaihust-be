@@ -2,7 +2,7 @@ const {query} = require('./client');
 
 const createLike = async (answerId, userId) => {
   const text = `INSERT INTO answer_likes (userid, answerid)
-                  VALUES ('${answerId}', ${userId})
+                  VALUES ('${userId}', ${answerId})
                   RETURNING id`;
   return await query(text);
 };
