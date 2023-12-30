@@ -83,8 +83,17 @@ const getNotifications = async (userid, page, limit) => {
   };
 };
 
+const readAllNotifications = async (userid) => {
+  const questionQuery = `UPDATE question_notifications SET hasread = 1 WHERE recipientid = ${userid}`;
+  const answerQuery = `UPDATE question_notifications SET hasread = 1 WHERE recipientid = ${userid}`;
+
+  await query(questionQuery);
+  await query(answerQuery);
+};
+
 module.exports = {
   createQuestionNotification,
   deleteNotification,
   getNotifications,
+  readAllNotifications,
 };

@@ -10,10 +10,28 @@ const getAll = async (req, res) => {
 
     return res.status(200).json({
       status: 'success',
-      message: 'Search results were successfully',
+      message: 'Notifications retrieved successfully',
       data: notifications,
     });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      status: 'fail',
+      message: 'Something went wrong',
+    });
+  }
+};
 
+const readAll = async (req, res) => {
+  try {
+    const userid = req.params.id;
+
+    await DB.questionNotifications.readAllNotifications(userid);
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Marked all notifications as read for the user.',
+    });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
@@ -25,4 +43,5 @@ const getAll = async (req, res) => {
 
 module.exports = {
   getAll,
+  readAll,
 };

@@ -676,6 +676,61 @@ CREATE TABLE public.users (
 
 ALTER TABLE public.users OWNER TO postgres;
 
+-- Thêm cột unreadcount vào bảng users và đặt giá trị mặc định là 0
+ALTER TABLE public.users
+ADD COLUMN unreadcount integer DEFAULT 0;
+
+-- Tạo hoặc cập nhật hàm trigger update_unread_count
+CREATE OR REPLACE FUNCTION update_unread_count()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Kiểm tra nếu là thao tác UPDATE
+    IF TG_OP = 'UPDATE' THEN
+        -- Kiểm tra xem giá trị hasread có thay đổi không
+        IF OLD.hasread <> NEW.hasread THEN
+            -- Cập nhật unreadcount dựa trên question_notifications và answer_notifications
+            UPDATE public.users
+            SET unreadcount = (
+                SELECT COUNT(*)
+                FROM public.question_notifications
+                WHERE recipientid = NEW.recipientid AND hasread = 0
+            ) + (
+                SELECT COUNT(*)
+                FROM public.answer_notifications
+                WHERE recipientid = NEW.recipientid AND hasread = 0
+            )
+            WHERE id = NEW.recipientid;
+        END IF;
+    ELSE
+        -- Xử lý cho các trường hợp INSERT hoặc DELETE
+        -- Cập nhật unreadcount dựa trên question_notifications và answer_notifications
+        UPDATE public.users
+        SET unreadcount = (
+            SELECT COUNT(*)
+            FROM public.question_notifications
+            WHERE recipientid = NEW.recipientid AND hasread = 0
+        ) + (
+            SELECT COUNT(*)
+            FROM public.answer_notifications
+            WHERE recipientid = NEW.recipientid AND hasread = 0
+        )
+        WHERE id = NEW.recipientid;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Tạo hoặc cập nhật trigger tr_update_unread_count
+CREATE TRIGGER tr_update_unread_count
+AFTER INSERT OR UPDATE OR DELETE ON public.question_notifications
+    FOR EACH ROW EXECUTE FUNCTION update_unread_count();
+
+-- Tạo hoặc cập nhật trigger tr_update_unread_count_answer
+CREATE TRIGGER tr_update_unread_count_answer
+AFTER INSERT OR UPDATE OR DELETE ON public.answer_notifications
+    FOR EACH ROW EXECUTE FUNCTION update_unread_count();
+    
 --
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
