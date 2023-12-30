@@ -681,7 +681,7 @@ ALTER TABLE public.users
 ADD COLUMN unreadcount integer DEFAULT 0;
 
 -- Tạo hoặc cập nhật hàm trigger update_unread_count
-CREATE OR REPLACE FUNCTION update_unread_count()
+CREATE OR REPLACE FUNCTION public.update_unread_count()
 RETURNS TRIGGER AS $$
 BEGIN
     -- Kiểm tra nếu là thao tác UPDATE
@@ -724,12 +724,12 @@ $$ LANGUAGE plpgsql;
 -- Tạo hoặc cập nhật trigger tr_update_unread_count
 CREATE TRIGGER tr_update_unread_count
 AFTER INSERT OR UPDATE OR DELETE ON public.question_notifications
-    FOR EACH ROW EXECUTE FUNCTION update_unread_count();
+    FOR EACH ROW EXECUTE FUNCTION public.update_unread_count();
 
 -- Tạo hoặc cập nhật trigger tr_update_unread_count_answer
 CREATE TRIGGER tr_update_unread_count_answer
 AFTER INSERT OR UPDATE OR DELETE ON public.answer_notifications
-    FOR EACH ROW EXECUTE FUNCTION update_unread_count();
+    FOR EACH ROW EXECUTE FUNCTION public.update_unread_count();
     
 --
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
