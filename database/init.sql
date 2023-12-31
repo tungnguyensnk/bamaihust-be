@@ -197,7 +197,7 @@ SET row_security = off;
 --
 -- Name: trigger_set_timestamp(); Type: FUNCTION; Schema: public; Owner: postgres
 --
-CREATE EXTENSION IF NOT EXISTS unaccent;
+CREATE EXTENSION IF NOT EXISTS unaccent WITH SCHEMA public;
 CREATE FUNCTION public.trigger_set_timestamp() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
