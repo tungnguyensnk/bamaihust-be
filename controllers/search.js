@@ -24,25 +24,24 @@ const searchAndFilter = async (req, res) => {
 
     if (objectType === 'question') {
       data = await DB.questions.searchAndFilter(filter);
-    } else if (objectType === 'user') {
-      data = await DB.users.findByKeyword(filter);
+    // } else if (objectType === 'user') {
+      // data = await DB.users.findByKeyword(filter);
     } else {
       // Xử lý khi objectType không hợp lệ
-      res.status(400).json({
+      return res.status(400).json({
         status: 'fail',
         message: 'Invalid objectType specified',
       });
-      return;
     }
 
     if (data) {
-      res.status(200).json({
+      return res.status(200).json({
         status: 'success',
         message: 'Search results were successfully',
         data: data,
       });
     } else {
-      res.status(500).json({
+      return res.status(500).json({
         status: 'fail',
         message: 'Something went wrong',
       });

@@ -77,7 +77,7 @@ const searchAndFilter = async (filter) => {
       WHERE answers.questionid = questions.id)
   `;
     } else {
-      orderByField = 'updatedat';
+      orderByField = 'questions.updatedat';
     }
 
     // Tạo điều kiện WHERE cho trạng thái
@@ -91,15 +91,7 @@ const searchAndFilter = async (filter) => {
     // Tạo điều kiện WHERE cho tags
     let tagsCondition = '';
     if (tags && tags.length > 0) {
-      tagsCondition = `
-      AND questions.id IN (
-        SELECT questionid
-        FROM question_tag
-        WHERE tagid IN (SELECT id FROM tags WHERE tagname IN (${tags
-          .map((tag) => `'${tag}'`)
-          .join(', ')}))
-      )
-    `;
+      tagsCondition = `AND tags.tagname IN (${tags.map((tag) => `'${tag}'`).join(', ')})`;
     }
 
     // Tạo điều kiện WHERE cho keyword
@@ -109,19 +101,27 @@ const searchAndFilter = async (filter) => {
     }
 
     // Tìm kiếm không phân biệt dấu và đếm tổng số kết quả
-    const countQuery = `SELECT COUNT(*)
-                      FROM questions
-                      WHERE 1 = 1
-                      ${keywordCondition}
-                      ${tagsCondition}
-                      ${statusCondition}`;
+    const countQuery = `SELECT COUNT(*) FROM (SELECT DISTINCT questions.id
+      FROM questions
+      JOIN question_tag ON questions.id = question_tag.questionid
+      JOIN tags ON question_tag.tagid = tags.id
+      WHERE 1 = 1
+      ${keywordCondition}
+      ${tagsCondition}
+      ${statusCondition}
+      ${
+        tagsCondition
+          ? `GROUP BY questions.id
+        HAVING COUNT(DISTINCT tags.tagname) = ${tags.length}`
+          : ''
+      }) as subquery`;
 
     const countResult = await query(countQuery);
-    const totalItems = countResult?.rows[0]?.count || 0;
+    const totalItems = parseInt(countResult?.rows[0]?.count) || 0;
 
     // Lấy dữ liệu trang hiện tại và thêm thông tin về số câu trả lời và danh sách tags
     const dataQuery = `
-    SELECT questions.*, 
+    SELECT DISTINCT questions.*, 
       (
         SELECT JSONB_AGG(
             JSONB_BUILD_OBJECT(
@@ -148,10 +148,18 @@ const searchAndFilter = async (filter) => {
       ) as tags
     FROM questions
     LEFT JOIN users ON questions.userid = users.id
+    JOIN question_tag ON questions.id = question_tag.questionid
+    JOIN tags ON question_tag.tagid = tags.id
     WHERE 1 = 1
     ${keywordCondition}
     ${tagsCondition}
     ${statusCondition}
+    ${
+      tagsCondition
+        ? `GROUP BY questions.id, questions.updatedat
+      HAVING COUNT(DISTINCT tags.tagname) = ${tags.length}`
+        : ''
+    }
     ORDER BY ${orderByField} DESC
     LIMIT ${limit} OFFSET ${offset}
   `;
@@ -189,11 +197,11 @@ const acceptAnswer = async (answerId, questionId) => {
 };
 
 const isLiked = async (questionId, userId) => {
-    const text = `SELECT *
+  const text = `SELECT *
     FROM question_likes
     WHERE questionid = ${questionId} AND userid = ${userId}`;
-    return (await query(text))?.rows[0];
-}
+  return (await query(text))?.rows[0];
+};
 
 module.exports = {
   getAllQuestions,

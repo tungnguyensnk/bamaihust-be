@@ -132,7 +132,7 @@ const createQuestionLikes = async (req, res) => {
     // Lấy trường likecount trong câu hỏi
     const question = await DB.questions.findById(questionId);
 
-    res.json({
+    return res.json({
       status: 'success',
       likeCount: question.likecount,
       message: existingLike ? 'You unliked the question' : 'You liked the question',
