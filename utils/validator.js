@@ -50,6 +50,7 @@ const search = [
 
     check('page')
         .optional()
+        .isInt({min: 1})
         .isNumeric().withMessage('Page should be a number'),
 ]
 
@@ -65,9 +66,39 @@ const mainPage = [
         .isIn(['newest', 'trending']).withMessage('sort must be \'newest\' or \'trending\''),
 ];
 
+const acceptAnswer = [
+    check('userId')
+        .exists()
+        .withMessage('User ID is required')
+        .isInt()
+        .withMessage('User ID must be a number'),
+];
+
+const likeAnswer = [
+    check('userId')
+        .exists()
+        .withMessage('User ID is required')
+        .isInt()
+        .withMessage('User ID must be a number'),
+];
+
+const likeQuestion = [
+    check('userId')
+        .exists()
+        .withMessage('User ID is required')
+        .isInt()
+        .withMessage('User ID must be a number'),
+];
+
+const notification = [check('page').optional().isInt({min: 1}).isNumeric().withMessage('Page should be a number')];
+
 module.exports = {
     question,
     answer,
     search,
     mainPage,
-}
+    acceptAnswer,
+    likeAnswer,
+    likeQuestion,
+    notification,
+};

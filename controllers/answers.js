@@ -41,7 +41,7 @@ const createAnswerLikes = async (req, res) => {
     // Lấy trường likecount trong câu trả lời
     const answer = await DB.answers.findById(answerId);
 
-    res.json({
+    return res.json({
       status: 'success',
       likeCount: answer.likecount,
       message: existingLike ? 'You unliked the answer' : 'You liked the answer',
@@ -103,8 +103,8 @@ const acceptAnswer = async (req, res) => {
     const userId = req.body.userId; // ID of the user who wrote the question
 
     const answer = await DB.answers.findById(answerId);
-    if (!answer?.questionId) {
-      res.status(404).json({
+    if (!answer || !answer.questionId) {
+      return res.status(404).json({
         status: 'fail',
         message: 'Answer not found',
       });
@@ -112,10 +112,10 @@ const acceptAnswer = async (req, res) => {
 
     const question = await DB.questions.findById(answer?.questionId);
 
-    if (!question?.acceptedAnswerId) {
+    if (!question || !question.acceptedAnswerId) {
       // Check if the answer is associated with the question
       if (question.id !== answer.questionId) {
-        res.status(404).json({
+        return res.status(404).json({
           status: 'fail',
           message: 'Answer does not exist',
         });
@@ -123,7 +123,7 @@ const acceptAnswer = async (req, res) => {
 
       const user = await DB.users.findById(userId);
       if (!user) {
-        res.status(404).json({
+        return res.status(404).json({
           status: 'fail',
           message: 'User not found',
         });
@@ -140,7 +140,7 @@ const acceptAnswer = async (req, res) => {
         content
       );
 
-      res.json({
+      return res.json({
         status: 'success',
         message: 'Answer has been accepted',
       });
