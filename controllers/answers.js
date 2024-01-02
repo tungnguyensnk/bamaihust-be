@@ -103,18 +103,18 @@ const acceptAnswer = async (req, res) => {
     const userId = req.body.userId; // ID of the user who wrote the question
 
     const answer = await DB.answers.findById(answerId);
-    if (!answer || !answer.questionId) {
+    if (!answer || !answer.questionid) {
       return res.status(404).json({
         status: 'fail',
         message: 'Answer not found',
       });
     }
 
-    const question = await DB.questions.findById(answer?.questionId);
+    const question = await DB.questions.findById(answer?.questionid);
 
     if (!question || !question.acceptedAnswerId) {
       // Check if the answer is associated with the question
-      if (question.id !== answer.questionId) {
+      if (question.id !== answer.questionid) {
         return res.status(404).json({
           status: 'fail',
           message: 'Answer does not exist',
@@ -129,7 +129,7 @@ const acceptAnswer = async (req, res) => {
         });
       }
 
-      await DB.questions.acceptAnswer(answerId, answer.questionId);
+      await DB.questions.acceptAnswer(answerId, answer.questionid);
 
       // Create a notification for the user who wrote the answer
       const content = `${user.fullname} đã chấp nhận câu trả lời của bạn: ${answer.content}`;
