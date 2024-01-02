@@ -70,12 +70,7 @@ const searchAndFilter = async (filter) => {
     // Sắp xếp
     let orderByField = '';
     if (sort === 'trending') {
-      orderByField = `
-    (SELECT COUNT(*) FROM question_notifications WHERE questionid = questions.id) +
-    (SELECT COUNT(*) FROM answer_notifications 
-      JOIN answers ON answer_notifications.answerid = answers.id
-      WHERE answers.questionid = questions.id)
-  `;
+      orderByField = 'notification_count';
     } else {
       orderByField = 'questions.updatedat';
     }
@@ -145,7 +140,12 @@ const searchAndFilter = async (filter) => {
         FROM question_tag
         JOIN tags ON question_tag.tagid = tags.id
         WHERE question_tag.questionid = questions.id
-      ) as tags
+      ) as tags,
+      (SELECT COUNT(*) FROM question_notifications WHERE questionid = questions.id) +
+      (SELECT COUNT(*)
+      FROM answer_notifications
+                JOIN answers ON answer_notifications.answerid = answers.id
+      WHERE answers.questionid = questions.id) as notification_count
     FROM questions
     LEFT JOIN users ON questions.userid = users.id
     JOIN question_tag ON questions.id = question_tag.questionid
@@ -164,6 +164,7 @@ const searchAndFilter = async (filter) => {
     LIMIT ${limit} OFFSET ${offset}
   `;
 
+    console.log(dataQuery);
     const result = await query(dataQuery);
     const questions = result?.rows;
 
